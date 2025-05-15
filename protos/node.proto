@@ -1,0 +1,98 @@
+syntax = "proto3";
+option go_package = "dfs/protogen/node";
+
+message Metadata {
+	string id = 1;
+	uint64 totalspace = 2;
+	uint64 freespace = 3;
+	repeated uint64 chunks = 4;
+}
+
+message Chunk {
+	uint64 id = 1;
+	bytes data = 2;
+	// hash will be provided by the storage node
+	optional string hash = 3;
+	optional uint64 size = 4;
+}
+
+message ChunkUploaded {
+	uint64 id = 1;
+	string hash = 2;
+	uint64 size = 3;
+	repeated string replicas = 4;
+}
+
+message Register {
+	Metadata metadata = 1;
+	string listenAddr = 2;
+}
+
+message Heartbeat {
+	Metadata metadata = 1;
+}
+
+message HeartbeatResponse {
+	repeated uint64 removeChunks = 1;
+}
+
+message GetChunk {
+	uint64 id = 1;
+}
+
+message PutChunk {
+	Chunk chunk = 1;
+	// replicas contains the list of node addresses to replicate the chunk to
+	repeated string replicas = 2;
+}
+
+message DeleteChunk {
+	uint64 id = 1;
+}
+
+message SendChunk {
+	uint64 id = 1;
+	repeated string replicas = 2;
+}
+
+message SendChunks {
+	repeated SendChunk chunks = 1;
+}
+
+message SendChunksResponse {
+	repeated SendChunkResponse chunks = 1;
+}
+
+message SendChunkResponse {
+	repeated string replicas = 1;
+}
+
+// ================= MapReduce ==================
+
+message MapTaskRequest {
+	string job_id = 1;
+	uint32 task_id = 2;          // Unique ID for this map task within the job
+	string map_func_id = 3;
+	uint64 input_chunk_id = 4;   // Chunk to process
+	uint32 num_reduce_tasks = 5; // Needed for partitioning intermediate results
+	string output_key_prefix = 6; // Prefix for intermediate output files (e.g., "jobid-map-taskid-")
+}
+
+message ReduceTaskRequest {
+	string job_id = 1;
+	uint32 task_id = 2;            // Unique ID for this reduce task within the job
+	string reduce_func_id = 3;
+	repeated string intermediate_keys = 4; // Keys/locations of intermediate files for this reducer
+	string final_output_key = 5;   // Key for the final output of this reducer
+
+}
+
+// Generic response for task completion, sent from node to controller
+message TaskCompletedRequest {
+	string job_id = 1;
+	uint32 task_id = 2;
+	bool is_map_task = 3; // Differentiate between map/reduce completion
+	bool success = 4;
+	string error_message = 5; // If success is false
+	repeated string output_keys = 6; // Intermediate keys (for map), final key (for reduce)
+}

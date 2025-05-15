@@ -1,0 +1,13 @@
+syntax = "proto3";
+option go_package = "dfs/protogen/rpc";
+
+import "google/protobuf/any.proto";
+
+message Transaction {
+	// payload message
+	google.protobuf.Any payload = 1;
+}
+
+message Error {
+	string message = 1;
+}

@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+option go_package = "dfs/protogen/common";
+
+message ChunkInfo {
+	uint64 id = 1;
+	uint64 size = 2;
+	repeated string replicas = 3;
+}
+
+message EmptyResponse {
+}

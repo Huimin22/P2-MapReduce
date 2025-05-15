@@ -1,0 +1,106 @@
+syntax = "proto3";
+option go_package = "dfs/protogen/client";
+
+import "protos/common.proto";
+import "google/protobuf/timestamp.proto";
+
+message StoreRequest {
+	string key = 1;
+	uint64 size = 2;
+	bool finished = 3;
+	bool is_text = 4;
+}
+
+message StoreResponse {
+	string key = 1;
+	repeated ChunkInfo chunks = 2;
+}
+
+message GetRequest {
+	string key = 1;
+}
+
+message GetResponse {
+	string key = 1;
+	repeated ChunkInfo chunks = 2;
+}
+
+message ListRequest {
+	string prefix = 1;
+}
+
+message File {
+	string key = 1;
+	uint64 size = 2;
+	google.protobuf.Timestamp createdAt = 3;
+	bool is_text = 4;
+}
+
+message ListResponse {
+	repeated File files = 1;
+}
+
+message DeleteRequest {
+	string key = 1;
+}
+
+message DeleteResponse {
+	bool isCandiate = 1;
+}
+
+message NodeInfoRequest {
+	optional string nodeId = 1;
+}
+
+message NodeInfo {
+	string id = 1;
+	uint64 totalspace = 2;
+	uint64 freespace = 3;
+}
+
+message NodeInfoResponse {
+	repeated NodeInfo nodes = 1;
+}
+
+// ================= MapReduce ==================
+
+message MapReduceRequest {
+	string input_key = 1;
+	string output_key = 2;
+	string map_func_id = 3;    // Identifier for the map function
+	string reduce_func_id = 4; // Identifier for the reduce function
+	uint32 num_reduce_tasks = 5; // Optional: specify number of reducers (default: 4)
+	bool controller_aggregate = 6; //
+}
+
+message MapReduceResponse {
+	string job_id = 1; // ID to track the job status (future implementation)
+	// Add more fields later, e.g., status, error message
+}
+
+// Request message for uploading a plugin
+message UploadPluginRequest {
+	string plugin_id = 1; // Unique ID for this plugin (e.g., "wordcount-plugin")
+	bytes plugin_code = 2; // The binary content of the .so/.dll file
+}
+
+// Response for UploadPluginRequest
+message UploadPluginResponse {
+	bool success = 1;
+	string message = 2; // Optional error/success message
+}
+
+// --- In protos/node.proto (or controller.proto) ---
+
+// Request message for downloading a plugin (Node asks Controller)
+message DownloadPluginRequest {
+	string plugin_id = 1; // ID of the plugin to download
+}
+
+// Response for DownloadPluginRequest (Controller sends to Node)
+message DownloadPluginResponse {
+	string plugin_id = 1;
+	bytes plugin_code = 2; // The binary content of the plugin
+	bool found = 3;        // Was the plugin found?
+	string error_message = 4; // If found is false or error occurred
+}
