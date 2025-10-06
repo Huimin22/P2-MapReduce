@@ -1,5 +1,14 @@
 # DFS Project
 
+## 🎥 Demo Video
+
+[![Watch the Demo](https://img.youtube.com/vi/FGk4-UDOMG4/0.jpg)](https://www.youtube.com/watch?v=FGk4-UDOMG4)
+> 👆 Click the image above to watch the **DFS Project Demo** on YouTube (Unlisted).
+
+
+## Running `storage-node`
+
+
 ## Running `storage-node`
 
 `storage-node` is the service responsible for storing files. It can be started with the following command:
